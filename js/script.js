@@ -90,11 +90,12 @@ window.addEventListener('DOMContentLoaded', function () {
 	}
 	setCloack('timer', deadLine);
 
-	const anchors = document.querySelectorAll('a[href*="#"]')
+	// Smooth scroll
+	const anchors = document.querySelectorAll('a[href*="#"]');
 
 	for (let anchor of anchors) {
 		anchor.addEventListener('click', function (e) {
-			e.preventDefault()
+			e.preventDefault();
 
 			const blockID = anchor.getAttribute('href');
 
@@ -104,4 +105,30 @@ window.addEventListener('DOMContentLoaded', function () {
 			});
 		});
 	}
+
+	// Modal
+	let more = document.querySelector('.more'),
+		overlay = document.querySelector('.overlay'),
+		close = document.querySelector('.popup-close'),
+		descriptionBtn = document.querySelectorAll('.description-btn');
+
+	more.addEventListener('click', function () {
+		overlay.style.display = 'block';
+		this.classList.add('more-splash');
+		document.body.style.overflow = 'hidden';
+	});
+
+	close.addEventListener('click', function () {
+		more.classList.remove('more-splash');
+		overlay.style.display = 'none';
+		document.body.style.overflow = '';
+	});
+
+	descriptionBtn.forEach(function (element) {
+		element.addEventListener('click', function () {
+			overlay.style.display = 'block';
+			this.classList.add('more-splash');
+			document.body.style.overflow = 'hidden';
+		});
+	});
 });
