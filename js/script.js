@@ -36,7 +36,7 @@ window.addEventListener("DOMContentLoaded", function () {
     }
 
     //  Timer
-    let deadLine = "2018-10-22";
+    let deadLine = "2018-12-22";
 
     function getTimeRemaninig(endtime) {
         let t = Date.parse(endtime) - Date.parse(new Date()),
@@ -78,21 +78,9 @@ window.addEventListener("DOMContentLoaded", function () {
                 seconds.textContent = "00";
                 clearInterval(timeInterval);
             } else {
-                if (h.length < 2) {
-                    hours.textContent = `0 ${h}`;
-                } else {
-                    hours.textContent = h;
-                }
-                if (m.length < 2) {
-                    minutes.textContent = `0 ${m}`;
-                } else {
-                    minutes.textContent = m;
-                }
-                if (s.length < 2) {
-                    seconds.textContent = `0 ${s}`;
-                } else {
-                    seconds.textContent = s;
-                }
+                hours.textContent = h.length < 2 ? `0${h}` : h;
+                minutes.textContent = m.length < 2 ? `0${m}` : m;
+                seconds.textContent = s.length < 2 ? `0${s}` : s;
             }
         }
     }
@@ -106,17 +94,8 @@ window.addEventListener("DOMContentLoaded", function () {
                 if (target == e) {
                     hideTabContent(0);
                     showTabContent(i);
-                    // break;
                 }
             });
-
-            // for (let i = 0; i < tab.length; i++) {
-            //     if (target == tab[i]) {
-            //         hideTabContent(0);
-            //         showTabContent(i);
-            //         break;
-            //     }
-            // }
         }
 
         // Modal
@@ -153,85 +132,66 @@ window.addEventListener("DOMContentLoaded", function () {
     };
 
     let form = document.querySelector(".main-form"),
+        contactForm = document.querySelector("#form"),
         input = document.getElementsByTagName("input"),
         statusMessage = document.createElement("div");
 
     statusMessage.classList.add("status");
 
-    form.addEventListener("submit", function (evet) {
-        event.preventDefault();
-        form.appendChild(statusMessage);
+    function sendForm(elem) {
+        elem.addEventListener("submit", function (e) {
+            e.preventDefault();
+            elem.appendChild(statusMessage);
 
-        let request = new XMLHttpRequest();
-        request.open("POST", "server.php");
-        request.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
+            let formData = new FormData(elem);
 
-        let formData = new FormData(form);
+            function postData(data) {
+                return new Promise(function (resolve, reject) {
+                    let request = new XMLHttpRequest();
 
-        let obj = {};
-        formData.forEach(function (value, key) {
-            obj[key] = value;
-        });
-        let json = JSON.stringify(obj);
+                    request.open("POST", "server.php");
 
-        request.send(json);
+                    request.setRequestHeader(
+                        "Content-Type",
+                        "application/json; charset=utf-8"
+                    );
 
-        request.addEventListener("readystatechange", function () {
-            if (request.readyState < 4) {
-                statusMessage.textContent = message.loading;
-            } else if (request.readyState === 4 && request.status == 200) {
-                statusMessage.textContent = message.success;
-            } else {
-                statusMessage.textContent = message.failure;
+                    request.onreadystatechange = function () {
+                        if (request.readyState < 4) {
+                            resolve();
+                        } else if (request.readyState === 4) {
+                            if (request.status == 200 && request.status < 3) {
+                                resolve();
+                                // statusMessage.textContent = message.success;
+                            } else {
+                                reject();
+                            }
+                        }
+                    };
+                    request.send(data);
+                });
+            } // End postData
+
+            function clearInputs() {
+                [...input].forEach(elem => (elem.value = ""));
             }
+            postData(formData)
+                .then(() => (statusMessage.textContent = message.loading))
+                .then(() => (statusMessage.textContent = message.success))
+                .catch(() => (statusMessage.textContent = message.failure))
+                .then(clearInputs);
         });
+    }
 
-        [...input].forEach(elem => elem.value = '');
-    });
-
-    //  Contact Form
-
-
-    let contactForm = document.querySelector("#form");
-
-
-    contactForm.addEventListener("submit", function (evet) {
-        event.preventDefault();
-        contactForm.appendChild(statusMessage);
-
-        let requestContact = new XMLHttpRequest();
-        requestContact.open("POST", "server.php");
-        requestContact.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
-
-        let formDataContact = new FormData(contactForm);
-
-        let objContact = {};
-        formDataContact.forEach(function (value, key) {
-            objContact[key] = value;
-        });
-        let jsonContact = JSON.stringify(objContact);
-
-        requestContact.send(jsonContact);
-
-        requestContact.addEventListener("readystatechange", function () {
-            if (requestContact.readyState < 4) {
-                statusMessage.textContent = message.loading;
-            } else if (requestContact.readyState === 4 && requestContact.status == 200) {
-                statusMessage.textContent = message.success;
-            } else {
-                statusMessage.textContent = message.failure;
-            }
-        });
-
-        [...input].forEach(elem => elem.value = '');
-    });
+    sendForm(form);
+    sendForm(contactForm);
 
     const inputsPhone = document.querySelectorAll('input[name="phone"]');
 
     function onlyNumber(input) {
         input.onkeydown = function () {
-            return this.value = this.value.replace(/[^0-9]/g, '')
-        }
+            return (this.value = this.value.replace(/[^0-9]/g, ""));
+        };
     }
     [...inputsPhone].forEach(elem => onlyNumber(elem));
 });
