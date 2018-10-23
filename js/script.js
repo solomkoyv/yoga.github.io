@@ -126,9 +126,9 @@ window.addEventListener("DOMContentLoaded", function () {
     //  Form
 
     let message = {
-        loading: "Загрузка ...",
-        success: "Спасибо скоро мы с вами свяжемся",
-        failure: "Что-то пошло не так ..."
+        loading: `<img src='https://img-fotki.yandex.ru/get/4914/54833049.21/0_803b8_ba6370a6_XS.jpg'>`,
+        success: `<img src='https://img-fotki.yandex.ru/get/5113/54833049.22/0_803bd_d6d87b9f_XS.jpg'>`,
+        failure: `<img src='https://img-fotki.yandex.ru/get/5810/54833049.22/0_803b9_56e09f93_XS.jpg'>`
     };
 
     let form = document.querySelector(".main-form"),
@@ -176,9 +176,9 @@ window.addEventListener("DOMContentLoaded", function () {
                 [...input].forEach(elem => (elem.value = ""));
             }
             postData(formData)
-                .then(() => (statusMessage.textContent = message.loading))
-                .then(() => (statusMessage.textContent = message.success))
-                .catch(() => (statusMessage.textContent = message.failure))
+                .then(() => (statusMessage.innerHTML = message.loading))
+                .then(() => (statusMessage.innerHTML = message.success))
+                .catch(() => (statusMessage.innerHTML = message.failure))
                 .then(clearInputs);
         });
     }
