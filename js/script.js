@@ -263,44 +263,32 @@ window.addEventListener("DOMContentLoaded", function () {
         restDays = document.querySelectorAll('.counter-block-input')[1],
         place = document.getElementById('select'),
         totalValue = document.getElementById('total'),
+        counter = document.querySelector('.counter'),
         personsSum = 0,
         daysSum = 0,
         total = 0;
 
-    totalValue.textContent = 0;
+    totalValue.textContent = 10;
 
-    function getValue() {
-        let select = document.getElementById("select"),
-            value = +select.value;
-        return value;
+    function calcTotal() {
+        let person = +persons.value,
+            days = +restDays.value,
+            sity = +place.value;
+        if ((person == '' || days == '') || (person == 0 || days == 0)) {
+            totalValue.textContent = 0;
+        } else {
+            totalValue.textContent = (days + person) * 4000 * sity;
+        }
     }
-    persons.addEventListener('change', function () {
-        personsSum = +this.value;
-        total = (daysSum + personsSum) * 4000 * getValue();
 
-        if ((restDays.value == '' || persons.value == '') || (restDays.value == 0 || persons.value == 0)) {
-            totalValue.textContent = 0;
-        } else {
-            totalValue.textContent = total;
+    counter.addEventListener('input', function (event) {
+        let target = event.target;
+
+        if (target && target.classList.contains('counter-block-input')) {
+            calcTotal();
         }
-    });
-    restDays.addEventListener('change', function () {
-        daysSum = +this.value;
-        total = (daysSum + personsSum) * 4000 * getValue();
-
-        if ((persons.value == '' || restDays.value == '') || (persons.value == 0 || restDays.value == 0)) {
-            totalValue.textContent = 0;
-        } else {
-            totalValue.textContent = total;
-        }
-    });
-
-    place.addEventListener('change', function () {
-        if ((restDays.value == '' || persons.value == '') || (restDays.value == 0 || persons.value == 0)) {
-            totalValue.textContent = 0;
-        } else {
-            let a = total;
-            totalValue.textContent = a * this.options[this.selectedIndex].value;
+        if (target && target.options) {
+            calcTotal();
         }
     });
 });
